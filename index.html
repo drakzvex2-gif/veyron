@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Veyron — Vista o que te move</title>
+<meta name="description" content="Veyron: moda com atitude, cortes precisos e exclusividade urbana.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#060f0c;
+    --deep:#0c2620;
+    --emerald:#123f31;
+    --emerald-line:#1c5744;
+    --bright:#22b880;
+    --gold:#c6a15b;
+    --gold-soft:#e7cf9c;
+    --cream:#f1ecdf;
+    --sage:#93a89c;
+    --search:#0f5132;
+    --max:1240px;
+    --pad:clamp(20px, 5vw, 64px);
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  html, body{ max-width:100%; overflow-x:hidden; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *,*::before,*::after{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+
+  body{
+    margin:0;
+    background:var(--black);
+    color:var(--cream);
+    font-family:'Manrope', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3,.wordmark{
+    font-family:'Unbounded', sans-serif;
+    margin:0;
+    line-height:1.08;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  img{ max-width:100%; display:block; }
+  ul{ list-style:none; margin:0; padding:0; }
+  button{ font-family:inherit; cursor:pointer; }
+
+  .wrap{ max-width:var(--max); margin:0 auto; padding-left:var(--pad); padding-right:var(--pad); }
+
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--gold-soft);
+    outline-offset:3px;
+  }
+
+  /* ---------- Header ---------- */
+  .site-header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    padding:22px 0;
+    transition:background-color .35s ease, padding .35s ease, border-color .35s ease;
+    border-bottom:1px solid transparent;
+  }
+  .site-header.is-scrolled{
+    background:rgba(6,15,12,0.92);
+    backdrop-filter:blur(10px);
+    padding:14px 0;
+    border-bottom-color:rgba(198,161,91,0.25);
+  }
+  .header-row{ display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .logo{ font-size:1.4rem; font-weight:800; letter-spacing:0.06em; color:var(--cream); }
+  .logo span{ color:var(--gold); }
+  .nav-links{ display:flex; gap:34px; }
+  .nav-links a{
+    font-size:0.95rem; color:var(--sage);
+    padding-bottom:4px; border-bottom:1px solid transparent;
+    transition:color .25s ease, border-color .25s ease;
+  }
+  .nav-links a:hover{ color:var(--cream); border-color:var(--gold); }
+  .header-actions{ display:flex; align-items:center; gap:18px; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    padding:13px 26px; font-size:0.92rem; font-weight:600;
+    border:1px solid transparent; white-space:nowrap;
+    transition:transform .25s ease, background-color .25s ease, border-color .25s ease, color .25s ease;
+  }
+  .btn-solid{ background:var(--gold); color:var(--black); }
+  .btn-solid:hover{ background:var(--gold-soft); transform:translateY(-2px); }
+  .btn-outline{ background:transparent; color:var(--cream); border-color:rgba(241,236,223,0.4); }
+  .btn-outline:hover{ border-color:var(--gold); color:var(--gold-soft); transform:translateY(-2px); }
+  .btn-outline svg{ width:16px; height:16px; flex-shrink:0; }
+  .btn-ghost{ background:transparent; color:var(--sage); border-color:rgba(147,168,156,0.35); }
+  .btn-ghost:hover{ color:var(--cream); border-color:var(--cream); }
+
+  .menu-toggle{
+    display:none; background:none; border:none; padding:8px; color:var(--cream);
+  }
+  .menu-toggle svg{ width:26px; height:26px; }
+
+  .icon-btn{
+    display:flex; align-items:center; justify-content:center;
+    width:42px; height:42px; background:transparent;
+    border:1px solid rgba(241,236,223,0.32); color:var(--cream);
+    transition:border-color .25s ease, color .25s ease, background-color .25s ease;
+  }
+  .icon-btn:hover{ border-color:var(--gold); color:var(--gold-soft); background:rgba(15,81,50,0.25); }
+  .icon-btn svg{ width:18px; height:18px; }
+
+  /* ---------- Pesquisa ---------- */
+  .search-overlay{
+    position:fixed; inset:0; z-index:200;
+    display:flex; justify-content:center; align-items:flex-start;
+    padding:clamp(90px, 14vh, 140px) var(--pad) 40px;
+    opacity:0; visibility:hidden;
+    transition:opacity .3s ease, visibility 0s linear .3s;
+  }
+  .search-overlay.open{ opacity:1; visibility:visible; transition:opacity .3s ease; }
+  .search-backdrop{
+    position:absolute; inset:0; background:rgba(6,15,12,0.86); backdrop-filter:blur(6px);
+  }
+  .search-panel{
+    position:relative; width:min(620px, 100%); max-height:70vh;
+    background:var(--black); border:1px solid var(--emerald-line);
+    padding:26px; display:flex; flex-direction:column;
+    transform:translateY(-16px) scale(0.97); opacity:0;
+    transition:transform .3s ease, opacity .3s ease;
+  }
+  .search-overlay.open .search-panel{
+    transform:translateY(0) scale(1); opacity:1; transition-delay:.05s;
+  }
+  .search-close{
+    position:absolute; top:14px; right:14px;
+    width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+    background:none; border:none; color:var(--sage); transition:color .2s ease;
+  }
+  .search-close:hover{ color:var(--cream); }
+  .search-close svg{ width:20px; height:20px; }
+  .search-field{
+    display:flex; align-items:center; gap:12px;
+    background:var(--deep); border:1px solid rgba(241,236,223,0.28);
+    padding:14px 16px;
+  }
+  .search-field:focus-within{
+    border-color:var(--search); box-shadow:0 0 0 3px rgba(15,81,50,0.4);
+  }
+  .search-field svg{ width:19px; height:19px; color:var(--gold); flex-shrink:0; }
+  .search-field input{
+    flex:1; min-width:0; background:none; border:none; outline:none;
+    color:var(--cream); font-family:'Manrope'; font-size:1rem;
+  }
+  .search-field input::placeholder{ color:var(--sage); }
+  .search-meta{ margin:14px 0 8px; font-size:0.84rem; color:var(--sage); }
+  .search-results{ overflow-y:auto; display:flex; flex-direction:column; }
+  .search-result{
+    display:flex; align-items:center; gap:14px; padding:13px 6px;
+    border-bottom:1px solid rgba(241,236,223,0.08);
+    transition:background-color .2s ease;
+  }
+  .search-result:hover{ background:rgba(15,81,50,0.3); }
+  .search-thumb{
+    width:44px; height:44px; flex-shrink:0;
+    background:linear-gradient(150deg, var(--emerald) 0%, var(--black) 100%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .search-thumb svg{ width:60%; color:var(--gold-soft); }
+  .search-result-info{ flex:1; min-width:0; }
+  .search-result-info h4{
+    font-family:'Manrope'; font-weight:700; font-size:0.94rem; color:var(--cream);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .search-result-info span{ font-size:0.8rem; color:var(--sage); }
+  .search-result-price{ font-family:'Unbounded'; font-size:0.85rem; color:var(--gold); white-space:nowrap; }
+  .search-empty{ text-align:center; padding:36px 12px; color:var(--sage); }
+  .search-empty strong{
+    display:block; font-family:'Unbounded'; font-size:1.05rem; color:var(--cream); margin-bottom:8px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative; padding-top:168px; padding-bottom:96px; overflow:hidden;
+    background:
+      radial-gradient(ellipse 80% 60% at 85% 10%, rgba(34,184,128,0.16), transparent 60%),
+      linear-gradient(180deg, var(--black) 0%, var(--black) 100%);
+  }
+  .hero-grid{
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center;
+  }
+  .hero-eyebrow{
+    font-size:0.92rem; color:var(--gold-soft); margin-bottom:22px;
+    padding-left:16px; border-left:2px solid var(--gold);
+  }
+  .hero h1{
+    font-size:clamp(2.6rem, 5.4vw, 4.6rem);
+    color:var(--cream);
+    max-width:12ch;
+  }
+  .hero p{
+    margin-top:26px; max-width:46ch; color:var(--sage); font-size:1.08rem;
+  }
+  .hero-actions{ margin-top:38px; display:flex; flex-wrap:wrap; gap:16px; }
+
+  .hero-visual{ position:relative; }
+  .hero-panel{
+    position:relative; aspect-ratio:4/5; background:var(--deep);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .hero-panel::before{
+    content:''; position:absolute; inset:0;
+    background-image:repeating-linear-gradient(115deg, rgba(198,161,91,0.09) 0 1px, transparent 1px 26px);
+  }
+  .hero-panel .sketch{ width:52%; color:var(--gold-soft); opacity:0.9; }
+  .hero-badge{
+    position:absolute; left:16px; bottom:14%; background:var(--black);
+    border:1px solid var(--emerald-line); padding:16px 20px;
+    max-width:min(200px, calc(100% - 32px));
+  }
+  .hero-badge strong{ display:block; font-family:'Unbounded'; font-size:1.4rem; color:var(--gold); }
+  .hero-badge span{ font-size:0.82rem; color:var(--sage); }
+
+  /* ---------- Divider ---------- */
+  .divider{ height:52px; width:100%; }
+  .divider-deep{ background:var(--deep); clip-path:polygon(0 100%, 100% 0, 100% 100%); }
+  .divider-deep.flip{ clip-path:polygon(0 0, 100% 100%, 0 100%); }
+  .divider-black{ background:var(--black); clip-path:polygon(0 100%, 100% 0, 100% 100%); }
+
+  /* ---------- Section shells ---------- */
+  section{ padding:88px 0; }
+  .on-deep{ background:var(--deep); }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:24px;
+    margin-bottom:52px; flex-wrap:wrap;
+  }
+  .section-head h2{ font-size:clamp(2rem, 3.6vw, 2.7rem); color:var(--cream); }
+  .section-head p{ color:var(--sage); max-width:38ch; margin-top:10px; }
+  .section-link{ font-size:0.92rem; color:var(--gold); border-bottom:1px solid var(--gold); padding-bottom:3px; white-space:nowrap; }
+  .section-link:hover{ color:var(--gold-soft); border-color:var(--gold-soft); }
+
+  /* ---------- Product grid ---------- */
+  .product-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:28px; }
+  .product-card{ border:1px solid transparent; transition:border-color .3s ease; }
+  .product-card:hover{ border-color:var(--emerald-line); }
+  .product-media{
+    position:relative; aspect-ratio:3/4; background:linear-gradient(150deg, var(--emerald) 0%, var(--black) 100%);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .product-media svg{ width:44%; color:rgba(241,236,223,0.75); transition:transform .4s ease; }
+  .product-card:hover .product-media svg{ transform:scale(1.06); }
+  .tag{
+    position:absolute; top:12px; left:12px; font-size:0.72rem; color:var(--black);
+    background:var(--gold-soft); padding:5px 10px;
+  }
+  .product-info{ padding:16px 4px 4px; display:flex; justify-content:space-between; gap:10px; }
+  .product-info > div{ flex:1; min-width:0; }
+  .product-info h3{ font-family:'Manrope'; font-weight:700; font-size:0.98rem; color:var(--cream); }
+  .product-info span.cat{ display:block; font-size:0.82rem; color:var(--sage); margin-top:2px; }
+  .price{ font-family:'Unbounded'; font-size:0.95rem; color:var(--gold); white-space:nowrap; }
+  .price.old{ font-family:'Manrope'; font-size:0.8rem; color:var(--sage); text-decoration:line-through; margin-right:8px; }
+
+  /* ---------- Categories ---------- */
+  .cat-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:20px; }
+  .cat-tile{
+    position:relative; aspect-ratio:3/4; overflow:hidden; background:var(--emerald);
+    display:flex; align-items:flex-end; padding:22px;
+  }
+  .cat-tile::before{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(200deg, rgba(34,184,128,0.28), rgba(6,15,12,0.85));
+    transition:transform .5s ease;
+  }
+  .cat-tile:hover::before{ transform:scale(1.08); }
+  .cat-tile span{
+    position:relative; font-family:'Unbounded'; font-size:1.15rem; color:var(--cream);
+    padding-bottom:6px; border-bottom:2px solid transparent; transition:border-color .3s ease;
+  }
+  .cat-tile:hover span{ border-color:var(--gold); }
+
+  /* ---------- Promo ---------- */
+  .promo{
+    background:linear-gradient(120deg, var(--emerald) 0%, var(--black) 75%);
+    text-align:left; position:relative;
+  }
+  .promo-inner{ display:flex; justify-content:space-between; align-items:center; gap:40px; flex-wrap:wrap; }
+  .promo h2{ font-size:clamp(2.1rem, 4.6vw, 3.4rem); color:var(--cream); max-width:16ch; }
+  .promo p{ color:var(--gold-soft); margin-top:14px; font-size:1.05rem; }
+
+  /* ---------- Testimonials ---------- */
+  .testi-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:36px; }
+  .testi-card{ padding:6px; }
+  .testi-mark{ font-family:'Unbounded'; font-size:2.6rem; color:var(--gold); line-height:1; }
+  .testi-card p{ margin-top:10px; color:var(--cream); font-size:1.02rem; }
+  .testi-name{ margin-top:22px; font-size:0.9rem; color:var(--sage); }
+  .testi-name strong{ color:var(--cream); font-weight:700; }
+
+  /* ---------- Final CTA ---------- */
+  .final-cta{ text-align:center; }
+  .final-cta h2{ font-size:clamp(2.1rem, 4.4vw, 3.2rem); max-width:18ch; margin:0 auto; }
+  .final-cta p{ color:var(--sage); margin:18px auto 0; max-width:42ch; }
+  .final-actions{ margin-top:36px; display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+
+  /* ---------- Footer ---------- */
+  footer{ background:var(--black); border-top:1px solid var(--emerald-line); padding:64px 0 28px; }
+  .footer-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px; }
+  .footer-brand p{ color:var(--sage); margin-top:14px; max-width:36ch; font-size:0.94rem; }
+  .social-row{ display:flex; gap:14px; margin-top:22px; }
+  .social-row a{
+    width:38px; height:38px; border:1px solid rgba(241,236,223,0.28);
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .25s ease, color .25s ease;
+  }
+  .social-row a:hover{ border-color:var(--gold); color:var(--gold); }
+  .social-row svg{ width:17px; height:17px; }
+  .footer-col h4{ font-family:'Manrope'; font-size:0.9rem; color:var(--cream); font-weight:700; margin-bottom:16px; }
+  .footer-col a{ display:block; color:var(--sage); font-size:0.92rem; padding:5px 0; transition:color .2s ease; }
+  .footer-col a:hover{ color:var(--gold-soft); }
+  .footer-bottom{
+    margin-top:52px; padding-top:22px; border-top:1px solid rgba(241,236,223,0.12);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    font-size:0.82rem; color:var(--sage);
+  }
+
+  /* ---------- Whatsapp float ---------- */
+  .whats-float{
+    position:fixed; z-index:95;
+    left:calc(18px + env(safe-area-inset-left, 0px));
+    bottom:calc(26px + env(safe-area-inset-bottom, 0px));
+    width:56px; height:56px; background:var(--bright); color:var(--black);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    transition:transform .25s ease;
+  }
+  .whats-float:hover{ transform:scale(1.08); }
+  .whats-float svg{ width:26px; height:26px; }
+
+  /* ---------- Reveal (single load moment) ---------- */
+  .reveal{ opacity:0; transform:translateY(18px); animation:reveal .8s ease forwards; }
+  .reveal-1{ animation-delay:.05s; }
+  .reveal-2{ animation-delay:.2s; }
+  .reveal-3{ animation-delay:.35s; }
+  @keyframes reveal{ to{ opacity:1; transform:translateY(0); } }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:980px){
+    .nav-links{ display:none; }
+    .menu-toggle{ display:block; }
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero-visual{ max-width:340px; margin:0 auto; }
+    .product-grid{ grid-template-columns:repeat(2, 1fr); }
+    .cat-grid{ grid-template-columns:repeat(2, 1fr); }
+    .testi-grid{ grid-template-columns:1fr; gap:44px; }
+    .footer-grid{ grid-template-columns:1fr 1fr; }
+    .header-actions .btn-outline span.label{ display:none; }
+  }
+  @media (max-width:560px){
+    .product-grid{ grid-template-columns:1fr 1fr; gap:16px; }
+    .cat-grid{ grid-template-columns:1fr; }
+    .footer-grid{ grid-template-columns:1fr; }
+    .promo-inner{ flex-direction:column; align-items:flex-start; }
+    section{ padding:64px 0; }
+    .header-actions .btn{ padding:11px 16px; font-size:0.85rem; }
+    .header-actions{ gap:10px; }
+    .header-actions .btn-outline{ display:none; }
+    .icon-btn{ width:38px; height:38px; }
+    .search-overlay{ padding-top:84px; }
+    .search-panel{ padding:18px; max-height:76vh; }
+    .whats-float{ width:52px; height:52px; }
+    .whats-float svg{ width:22px; height:22px; }
+  }
+  @media (max-width:400px){
+    .logo{ font-size:1.15rem; }
+    .header-actions{ gap:8px; }
+    .header-actions .btn{ padding:9px 13px; font-size:0.8rem; }
+    .icon-btn{ width:34px; height:34px; }
+    .icon-btn svg{ width:16px; height:16px; }
+    .menu-toggle{ padding:6px; }
+    .menu-toggle svg{ width:22px; height:22px; }
+  }
+
+  /* Mobile nav drawer */
+  .mobile-nav{
+    position:fixed; inset:0; background:rgba(6,15,12,0.98); z-index:120;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px;
+    transform:translateY(-100%); transition:transform .35s ease;
+  }
+  .mobile-nav.open{ transform:translateY(0); }
+  .mobile-nav a{ font-family:'Unbounded'; font-size:1.4rem; color:var(--cream); }
+  .mobile-nav .close-btn{ position:absolute; top:24px; right:var(--pad); background:none; border:none; color:var(--cream); }
+  .mobile-nav .close-btn svg{ width:26px; height:26px; }
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-row">
+    <a href="#top" class="logo">VEY<span>RON</span></a>
+    <nav class="nav-links">
+      <a href="#novidades">Novidades</a>
+      <a href="#mais-vendidos">Mais vendidos</a>
+      <a href="#categorias">Categorias</a>
+      <a href="#promocoes">Promoções</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="searchToggle" aria-label="Pesquisar produtos" aria-haspopup="dialog" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <a class="btn btn-outline" href="https://wa.me/5588996518222" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 18l1-4a7 7 0 1 1 3 3z"/></svg>
+        <span class="label">WhatsApp</span>
+      </a>
+      <a class="btn btn-solid" href="#mais-vendidos">Comprar</a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="close-btn" id="closeMenu" aria-label="Fechar menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+  </button>
+  <a href="#novidades">Novidades</a>
+  <a href="#mais-vendidos">Mais vendidos</a>
+  <a href="#categorias">Categorias</a>
+  <a href="#promocoes">Promoções</a>
+  <a href="#contato">Contato</a>
+</div>
+
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Pesquisar produtos">
+  <div class="search-backdrop" id="searchBackdrop"></div>
+  <div class="search-panel">
+    <button class="search-close" id="searchClose" aria-label="Fechar pesquisa">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+    </button>
+    <div class="search-field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Buscar por nome, categoria ou palavra-chave" autocomplete="off">
+    </div>
+    <p class="search-meta" id="searchMeta"></p>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="reveal reveal-1">
+        <p class="hero-eyebrow">Nova coleção de inverno já disponível</p>
+        <h1>Vista o que te move.</h1>
+        <p>Peças exclusivas, cortes precisos e atitude urbana em cada detalhe. A Veyron veste quem define o próprio ritmo — sem pedir licença.</p>
+        <div class="hero-actions">
+          <a class="btn btn-solid" href="#mais-vendidos">Ver coleção</a>
+          <a class="btn btn-outline" href="https://wa.me/5588996518222" target="_blank" rel="noopener">Falar no WhatsApp</a>
+        </div>
+      </div>
+      <div class="reveal reveal-2">
+        <div class="hero-visual">
+          <div class="hero-panel">
+            <svg class="sketch" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.3">
+              <path d="M35 18 L44 12 L56 12 L65 18 L72 26 L64 32 L64 88 L36 88 L36 32 L28 26 Z"/>
+              <path d="M44 12 C 44 20, 56 20, 56 12" />
+            </svg>
+          </div>
+          <div class="hero-badge">
+            <strong>Edição limitada</strong>
+            <span>Estoque reduzido nesta coleção</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider divider-deep"></div>
+
+  <!-- NOVIDADES -->
+  <section class="on-deep" id="novidades">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Novidades</h2>
+          <p>Peças recém-chegadas para quem gosta de sair na frente.</p>
+        </div>
+        <a class="section-link" href="#contato">Ver tudo</a>
+      </div>
+      <div class="product-grid">
+
+        <article class="product-card">
+          <div class="product-media">
+            <span class="tag">Novo</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M30 30 L38 22 L62 22 L70 30 L78 40 L68 48 L68 82 L32 82 L32 48 L22 40 Z"/></svg>
+          </div>
+          <div class="product-info">
+            <div><h3>Jaqueta Corte Zero</h3><span class="cat">Masculino</span></div>
+            <span class="price">R$ 489</span>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <div class="product-media">
+            <span class="tag">Novo</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M50 15 C 40 15 35 25 35 32 L28 85 L72 85 L65 32 C 65 25 60 15 50 15 Z"/><path d="M40 30 L60 30"/></svg>
+          </div>
+          <div class="product-info">
+            <div><h3>Vestido Linha Reta</h3><span class="cat">Feminino</span></div>
+            <span class="price">R$ 359</span>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <div class="product-media">
+            <span class="tag">Novo</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20 65 L30 40 L42 40 L38 58 L70 58 L78 50 L86 55 L80 72 L20 72 Z"/></svg>
+          </div>
+          <div class="product-info">
+            <div><h3>Sneaker Baixa Precisão</h3><span class="cat">Calçados</span></div>
+            <span class="price">R$ 599</span>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <div class="product-media">
+            <span class="tag">Novo</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="28" y="38" width="44" height="38" rx="2"/><path d="M38 38 V28 C38 20 62 20 62 28 V38"/></svg>
+          </div>
+          <div class="product-info">
+            <div><h3>Bolsa Estrutura Rígida</h3><span class="cat">Acessórios</span></div>
+            <span class="price">R$ 429</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIS VENDIDOS -->
+  <section id="mais-vendidos">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Mais vendidos</h2>
+          <p>Os favoritos de quem já vestiu Veyron.</p>
+        </div>
+        <a class="section-link" href="#contato">Ver tudo</a>
+      </div>
+      <div class="product-grid">
+
+        <article class="product-card">
+          <div class="product-media">
+            <span class="tag">Mais vendido</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M30 30 L40 24 L60 24 L70 30 L64 40 L64 82 L36 82 L36 40 Z"/></svg>
+          </div>
+          <div class="product-info">
+            <div><h3>Camiseta Base Premium</h3><span class="cat">Unissex</span></div>
+            <span class="price">R$ 149</span>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <div class="product-media">
+            <span class="tag">Mais vendido</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M32 22 H68 V38 H60 V82 H40 V38 H32 Z"/></svg>
+          </div>
+          <div class="product-info">
+            <div><h3>Calça Alfaiataria Slim</h3><span class="cat">Masculino</span></div>
+            <span class="price">R$ 329</span>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <div class="product-media">
+            <span class="tag">Mais vendido</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M50 15 C 40 15 35 25 35 32 L30 60 L70 60 L65 32 C 65 25 60 15 50 15 Z"/></svg>
+          </div>
+          <div class="product-info">
+            <div><h3>Blusa Corte Assimétrico</h3><span class="cat">Feminino</span></div>
+            <span class="price">R$ 219</span>
+          </div>
+        </article>
+
+        <article class="product-card">
+          <div class="product-media">
+            <span class="tag">Mais vendido</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="50" cy="35" r="14"/><path d="M50 49 V78 M38 65 H62"/></svg>
+          </div>
+          <div class="product-info">
+            <div><h3>Relógio Aço Fosco</h3><span class="cat">Acessórios</span></div>
+            <span class="price">R$ 689</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider divider-deep"></div>
+
+  <!-- CATEGORIAS -->
+  <section class="on-deep" id="categorias">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Categorias</h2>
+          <p>Encontre seu estilo.</p>
+        </div>
+      </div>
+      <div class="cat-grid">
+        <a class="cat-tile" href="#"><span>Masculino</span></a>
+        <a class="cat-tile" href="#"><span>Feminino</span></a>
+        <a class="cat-tile" href="#"><span>Acessórios</span></a>
+        <a class="cat-tile" href="#"><span>Calçados</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMOÇÕES -->
+  <section class="promo" id="promocoes">
+    <div class="wrap promo-inner">
+      <div>
+        <h2>Até 40% off em peças selecionadas.</h2>
+        <p>Por tempo limitado. Exclusividade tem prazo.</p>
+      </div>
+      <a class="btn btn-solid" href="https://wa.me/5588996518222" target="_blank" rel="noopener">Aproveitar agora</a>
+    </div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section id="depoimentos">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Depoimentos</h2>
+          <p>Quem veste, aprova.</p>
+        </div>
+      </div>
+      <div class="testi-grid">
+        <div class="testi-card">
+          <div class="testi-mark">"</div>
+          <p>Cada peça parece feita sob medida pra minha rotina. É o único lugar onde compro sem pensar duas vezes.</p>
+          <div class="testi-name"><strong>Marina T.</strong> — cliente desde 2024</div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-mark">"</div>
+          <p>Recebi elogios na primeira vez que usei a jaqueta. Acabamento impecável e entrega rápida.</p>
+          <div class="testi-name"><strong>Lucas A.</strong> — cliente desde 2025</div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-mark">"</div>
+          <p>Atendimento pelo WhatsApp resolveu tudo em minutos. Virei cliente fixa da Veyron.</p>
+          <div class="testi-name"><strong>Bianca R.</strong> — cliente desde 2023</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider divider-black"></div>
+
+  <!-- CTA FINAL -->
+  <section class="on-deep final-cta" id="contato">
+    <div class="wrap">
+      <h2>Pronto para vestir a atitude Veyron?</h2>
+      <p>Fale com a gente agora e garanta sua peça antes que o estoque acabe.</p>
+      <div class="final-actions">
+        <a class="btn btn-solid" href="https://wa.me/5588996518222" target="_blank" rel="noopener">Chamar no WhatsApp</a>
+        <a class="btn btn-outline" href="#mais-vendidos">Comprar online</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#top" class="logo">VEY<span>RON</span></a>
+        <p>Veyron é atitude, precisão e exclusividade em cada peça. Moda para quem não segue — lidera.</p>
+        <div class="social-row">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" stroke="none"/></svg></a>
+          <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 4 v10.5 a3.5 3.5 0 1 1 -3.5 -3.5"/><path d="M14 4 c0 3 2.2 5 5 5"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 8h-2a2 2 0 0 0 -2 2v10"/><path d="M9 13h5"/><circle cx="12" cy="12" r="9"/></svg></a>
+          <a href="https://wa.me/5588996518222" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 18l1-4a7 7 0 1 1 3 3z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Loja</h4>
+        <a href="#novidades">Novidades</a>
+        <a href="#mais-vendidos">Mais vendidos</a>
+        <a href="#promocoes">Promoções</a>
+        <a href="#categorias">Categorias</a>
+      </div>
+      <div class="footer-col">
+        <h4>Ajuda</h4>
+        <a href="#">Trocas e devoluções</a>
+        <a href="#">Prazos de entrega</a>
+        <a href="#">Guia de tamanhos</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contato</h4>
+        <a href="https://wa.me/5588996518222" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="#">contato@veyron.com.br</a>
+        <a href="#">Juazeiro do Norte, CE</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Veyron. Todos os direitos reservados.</span>
+      <span>Feito para quem não pisa no freio.</span>
+    </div>
+  </div>
+</footer>
+
+<a class="whats-float" href="https://wa.me/5588996518222" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 18l1-4a7 7 0 1 1 3 3z"/></svg>
+</a>
+
+<script>
+  var header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', function(){
+    header.classList.toggle('is-scrolled', window.scrollY > 40);
+  });
+
+  var menuToggle = document.getElementById('menuToggle');
+  var closeMenu = document.getElementById('closeMenu');
+  var mobileNav = document.getElementById('mobileNav');
+  menuToggle.addEventListener('click', function(){ mobileNav.classList.add('open'); });
+  closeMenu.addEventListener('click', function(){ mobileNav.classList.remove('open'); });
+  mobileNav.querySelectorAll('a').forEach(function(link){
+    link.addEventListener('click', function(){ mobileNav.classList.remove('open'); });
+  });
+
+  // ---------- Pesquisa ----------
+  var searchProducts = [
+    { name:"Jaqueta Corte Zero",        category:"Masculino",   price:489, section:"novidades",     icon:"jacket"  },
+    { name:"Vestido Linha Reta",        category:"Feminino",    price:359, section:"novidades",     icon:"dress"   },
+    { name:"Sneaker Baixa Precisão",    category:"Calçados",    price:599, section:"novidades",     icon:"sneaker" },
+    { name:"Bolsa Estrutura Rígida",    category:"Acessórios",  price:429, section:"novidades",     icon:"bag"     },
+    { name:"Camiseta Base Premium",     category:"Unissex",     price:149, section:"mais-vendidos", icon:"tshirt"  },
+    { name:"Calça Alfaiataria Slim",    category:"Masculino",   price:329, section:"mais-vendidos", icon:"pants"   },
+    { name:"Blusa Corte Assimétrico",   category:"Feminino",    price:219, section:"mais-vendidos", icon:"blouse"  },
+    { name:"Relógio Aço Fosco",         category:"Acessórios",  price:689, section:"mais-vendidos", icon:"watch"   }
+  ];
+
+  var searchIcons = {
+    jacket:  '<path d="M30 30 L38 22 L62 22 L70 30 L78 40 L68 48 L68 82 L32 82 L32 48 L22 40 Z"/>',
+    dress:   '<path d="M50 15 C 40 15 35 25 35 32 L28 85 L72 85 L65 32 C 65 25 60 15 50 15 Z"/><path d="M40 30 L60 30"/>',
+    sneaker: '<path d="M20 65 L30 40 L42 40 L38 58 L70 58 L78 50 L86 55 L80 72 L20 72 Z"/>',
+    bag:     '<rect x="28" y="38" width="44" height="38" rx="2"/><path d="M38 38 V28 C38 20 62 20 62 28 V38"/>',
+    tshirt:  '<path d="M30 30 L40 24 L60 24 L70 30 L64 40 L64 82 L36 82 L36 40 Z"/>',
+    pants:   '<path d="M32 22 H68 V38 H60 V82 H40 V38 H32 Z"/>',
+    blouse:  '<path d="M50 15 C 40 15 35 25 35 32 L30 60 L70 60 L65 32 C 65 25 60 15 50 15 Z"/>',
+    watch:   '<circle cx="50" cy="35" r="14"/><path d="M50 49 V78 M38 65 H62"/>'
+  };
+
+  var sectionNames = { "novidades":"Novidades", "mais-vendidos":"Mais vendidos" };
+
+  function normalizeText(str){
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  var searchOverlay = document.getElementById('searchOverlay');
+  var searchToggle = document.getElementById('searchToggle');
+  var searchClose = document.getElementById('searchClose');
+  var searchBackdrop = document.getElementById('searchBackdrop');
+  var searchInput = document.getElementById('searchInput');
+  var searchResults = document.getElementById('searchResults');
+  var searchMeta = document.getElementById('searchMeta');
+
+  function renderSearch(query){
+    var q = normalizeText(query.trim());
+    var matches = searchProducts.filter(function(p){
+      var haystack = normalizeText(p.name + ' ' + p.category);
+      return haystack.indexOf(q) !== -1;
+    });
+
+    if(q === ''){
+      searchMeta.textContent = searchProducts.length + ' produtos no catálogo';
+    } else {
+      searchMeta.textContent = matches.length +
+        (matches.length === 1 ? ' resultado para "' : ' resultados para "') + query.trim() + '"';
+    }
+
+    if(matches.length === 0){
+      searchResults.innerHTML =
+        '<div class="search-empty">' +
+          '<strong>Nenhum produto encontrado</strong>' +
+          'Tente buscar por nome, categoria (ex: feminino) ou palavra-chave (ex: jaqueta).' +
+        '</div>';
+      return;
+    }
+
+    searchResults.innerHTML = matches.map(function(p){
+      return (
+        '<a class="search-result" href="#' + p.section + '">' +
+          '<div class="search-thumb"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4">' + searchIcons[p.icon] + '</svg></div>' +
+          '<div class="search-result-info"><h4>' + p.name + '</h4><span>' + p.category + ', ' + sectionNames[p.section] + '</span></div>' +
+          '<span class="search-result-price">R$ ' + p.price + '</span>' +
+        '</a>'
+      );
+    }).join('');
+  }
+
+  function openSearch(){
+    searchOverlay.classList.add('open');
+    searchToggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    renderSearch('');
+    setTimeout(function(){ searchInput.focus(); }, 120);
+  }
+
+  function closeSearch(){
+    searchOverlay.classList.remove('open');
+    searchToggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    searchInput.value = '';
+  }
+
+  searchToggle.addEventListener('click', openSearch);
+  searchClose.addEventListener('click', closeSearch);
+  searchBackdrop.addEventListener('click', closeSearch);
+  searchInput.addEventListener('input', function(){ renderSearch(searchInput.value); });
+  searchResults.addEventListener('click', function(e){
+    if(e.target.closest('.search-result')) closeSearch();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && searchOverlay.classList.contains('open')) closeSearch();
+  });
+</script>
+
+</body>
+</html>
